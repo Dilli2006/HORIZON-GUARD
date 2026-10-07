@@ -180,15 +180,130 @@ export interface MerchantTrustItem {
   level: 'trusted' | 'neutral' | 'risky';
 }
 
-// Helper fetcher
+import { mockSummary, mockAnomalies, mockExpenses, mockTimeline } from './demoData';
+
+// Helper fetcher with seamless static demo fallback for GitHub Pages
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE}${path}`;
-  const res = await fetch(url, options);
-  if (!res.ok) {
-    const errorText = await res.text().catch(() => '');
-    throw new Error(`API Error ${res.status}: ${errorText || res.statusText}`);
+  try {
+    const res = await fetch(url, options);
+    if (!res.ok) {
+      throw new Error(`API Error ${res.status}`);
+    }
+    return await res.json();
+  } catch (err) {
+    // Graceful offline / GitHub Pages demo fallback
+    if (path.startsWith('/summary')) return mockSummary as any;
+    if (path.startsWith('/anomalies')) return mockAnomalies as any;
+    if (path.startsWith('/expenses')) return mockExpenses as any;
+    if (path.startsWith('/timeline')) return mockTimeline as any;
+    if (path.startsWith('/budgets')) return mockSummary.budgets as any;
+    if (path.startsWith('/forecast')) {
+      return [
+        { category: "Shopping", spent: 12400, projected: 18500, limit: 9000, status: "over", day: 22, message: "Shopping exceeded budget by 38%", pct_projected: 205 },
+        { category: "Food", spent: 11450, projected: 13800, limit: 14000, status: "ok", day: null, message: "Food is on track", pct_projected: 98 },
+        { category: "Bills", spent: 26858, projected: 31500, limit: 32000, status: "ok", day: null, message: "Bills within safe limits", pct_projected: 98 },
+      ] as any;
+    }
+    if (path.startsWith('/subscriptions')) {
+      return [
+        { merchant: "Spotify Premium", category: "Entertainment", amount: 139, previous_amount: 119, change_pct: 16.8, cadence: "monthly", occurrences: 4, next_expected: "2026-11-12", annual_cost: 1668, alert: "Silent price increase detected (+17%)" },
+        { merchant: "Netflix", category: "Entertainment", amount: 649, previous_amount: 649, change_pct: 0, cadence: "monthly", occurrences: 4, next_expected: "2026-11-07", annual_cost: 7788, alert: null },
+        { merchant: "Cult.fit", category: "Health", amount: 1499, previous_amount: 1499, change_pct: 0, cadence: "monthly", occurrences: 3, next_expected: "2026-11-15", annual_cost: 17988, alert: null },
+      ] as any;
+    }
+    if (path.startsWith('/court')) {
+      return {
+        anomaly_id: 1,
+        source: "template",
+        rounds: [
+          { speaker: "prosecutor", round: 1, text: "Your Honour, transaction #1 is an extreme 14.3× outlier over the user's shopping median. A single swipe of ₹42,999 violates all historical norms." },
+          { speaker: "defender", round: 1, text: "Objection! My client has made over 260 legitimate transactions and previously purchased appliances during festival seasons. This is a planned family electronics purchase." },
+          { speaker: "prosecutor", round: 2, text: "The arithmetic is undeniable. The user has never spent above ₹3,200 on this account without 2FA pre-authorization." },
+          { speaker: "defender", round: 2, text: "Closing: The transaction took place during daylight hours with clean geolocation. I request a ruling of Legit unless the user reports card theft." },
+        ],
+        evidence: mockAnomalies[0].contributions,
+        counterfactuals: mockAnomalies[0].counterfactuals,
+        history: { merchant_visits: 12, category_median: 3000, total_txns: 269 },
+      } as any;
+    }
+    if (path.startsWith('/verdict')) {
+      return {
+        verdict: (options?.body ? JSON.parse(options.body as string).verdict : 'fraud'),
+        open_before: 19,
+        open_after: 18,
+        immunity_before: 75,
+        immunity_after: 78,
+        note: "Antibody synthesized. Model updated.",
+      } as any;
+    }
+    if (path.startsWith('/antibodies')) {
+      return {
+        antibodies: [
+          { id: 1, pattern_signature: { merchant: "Amazon", category: "Shopping", amount_min: 30000, amount_max: 50000, hour_start: 14, hour_end: 18 }, description: "Learned from ₹42,999 luxury electronics anomaly", hits: 4, origin: "learned", created_at: "2026-10-01" },
+          { id: 2, pattern_signature: { merchant: "Delhi Duty Free", category: "Shopping", amount_min: 10000, amount_max: 20000, hour_start: 12, hour_end: 16 }, description: "Learned from Impossible Travel Delhi vector", hits: 2, origin: "acquired", created_at: "2026-10-03" },
+        ],
+        whitelist: [
+          { id: 1, pattern_signature: { merchant: "Swiggy", category: "Food", amount_min: 200, amount_max: 900, hour_start: 11, hour_end: 23 }, description: "Confirmed legit: Swiggy regular orders", hits: 14, created_at: "2026-09-15" }
+        ],
+      } as any;
+    }
+    if (path.startsWith('/spend-dna')) {
+      return {
+        categories: [
+          { category: "Bills", share: 0.35 },
+          { category: "Shopping", share: 0.28 },
+          { category: "Food", share: 0.18 },
+          { category: "Travel", share: 0.10 },
+          { category: "Entertainment", share: 0.05 },
+          { category: "Health", share: 0.04 },
+        ],
+        hours: [0.05, 0.02, 0.08, 0.15, 0.04, 0.02, 0.05, 0.2, 0.45, 0.65, 0.75, 0.85, 0.9, 0.8, 0.7, 0.65, 0.7, 0.85, 0.95, 0.8, 0.6, 0.4, 0.2, 0.1],
+        weekdays: [0.6, 0.7, 0.95, 0.8, 0.85, 1.0, 0.75],
+        glitches: [
+          { anomaly_id: 1, hour: 15.2, category: "Shopping", weekday: 3, score: 92, severity: "High", merchant: "Amazon", amount: 42999 },
+          { anomaly_id: 2, hour: 13.8, category: "Shopping", weekday: 5, score: 85, severity: "High", merchant: "Delhi Duty Free", amount: 16450 },
+          { anomaly_id: 4, hour: 3.8, category: "Food", weekday: 6, score: 68, severity: "High", merchant: "Swiggy Instamart", amount: 1240 },
+        ],
+        fingerprint: "e89c204b71",
+        traits: ["Shopping-Spike Tendency", "Peak hour 19:00", "Busiest day Saturday"],
+      } as any;
+    }
+    if (path.startsWith('/merchant-trust')) {
+      return {
+        "Amazon": { merchant: "Amazon", trust: 85, visits: 24, first_seen: "2026-08-01", level: "trusted" },
+        "Swiggy": { merchant: "Swiggy", trust: 92, visits: 42, first_seen: "2026-08-01", level: "trusted" },
+        "Uber": { merchant: "Uber", trust: 88, visits: 31, first_seen: "2026-08-02", level: "trusted" },
+        "Delhi Duty Free Electronics": { merchant: "Delhi Duty Free Electronics", trust: 15, visits: 1, first_seen: "2026-10-02", level: "risky" },
+        "NoBroker Rent": { merchant: "NoBroker Rent", trust: 95, visits: 3, first_seen: "2026-08-01", level: "trusted" },
+      } as any;
+    }
+    if (path.startsWith('/assistant/ask')) {
+      return {
+        answer: "Based on your records for the last 30 days, you spent **₹14,200** on Food across 28 transactions. Your largest single food expense was **₹900** at Meghana Foods.",
+        intent: { category: "Food", aggregation: "sum", period: "last_30_days" },
+        chart: {
+          type: "bar",
+          data: [
+            { label: "Swiggy", value: 5200 },
+            { label: "Zomato", value: 3800 },
+            { label: "Meghana Foods", value: 2400 },
+            { label: "Starbucks", value: 1600 },
+            { label: "Chai Point", value: 1200 },
+          ],
+        },
+        source: "rules",
+      } as any;
+    }
+    if (path.startsWith('/simulator/inject')) {
+      return {
+        kind: "travel",
+        label: "Impossible Travel",
+        events: [{ type: "anomaly", merchant: "Delhi Duty Free", amount: 16450, risk_score: 85, severity: "High", reason: "Bengaluru → Delhi in 45 min" }],
+      } as any;
+    }
+    return {} as any;
   }
-  return res.json();
 }
 
 export const api = {
