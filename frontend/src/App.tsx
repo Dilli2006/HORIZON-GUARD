@@ -22,6 +22,8 @@ import { DemoTour } from './components/DemoTour';
 // API & Hooks
 import { api, SummaryData, AnomalyDetail, MerchantTrustItem, TimelinePoint } from './lib/api';
 import { useSSE } from './hooks/useSSE';
+import { motion, AnimatePresence } from 'framer-motion';
+import { AuroraGlow } from './components/ui/AuroraGlow';
 
 export function App() {
   const [darkMode, setDarkMode] = useState(false); // Default to Horizon light clean theme, with full dark mode toggle
@@ -144,7 +146,11 @@ export function App() {
   };
 
   return (
-    <div className="flex h-full min-h-screen w-full bg-lightPrimary dark:bg-navy-900 font-dm transition-colors">
+    <div className="relative flex h-full min-h-screen w-full bg-lightPrimary dark:bg-navy-900 font-dm transition-colors overflow-x-hidden">
+      {/* 21st.dev / React Bits Ambient Aurora Glow in canvas corners */}
+      <AuroraGlow size="lg" className="-top-32 -right-32 opacity-40 dark:opacity-30" />
+      <AuroraGlow size="md" className="top-1/2 -left-28 opacity-25 dark:opacity-20" />
+
       {/* 1. Horizon UI Fixed Sidebar */}
       <Sidebar
         activeTab={activeTab}
@@ -158,7 +164,7 @@ export function App() {
       />
 
       {/* 2. Main Horizon Content Area */}
-      <div className="h-full w-full xl:ml-72 flex flex-col min-h-screen">
+      <div className="relative z-10 h-full w-full xl:ml-72 flex flex-col min-h-screen">
         {/* Real-Time Floating SSE Toasts */}
         <ToastContainer toasts={toasts} onDismiss={dismissToast} />
 
@@ -176,53 +182,61 @@ export function App() {
             onOpenMobileMenu={() => setMobileMenuOpen(true)}
           />
 
-          {/* Main Views Container */}
+          {/* Main Views Container with Framer Motion Page Transition */}
           <main className="flex-1">
             {summary ? (
-              <>
-                {activeTab === 'overview' && (
-                  <OverviewTab
-                    summary={summary}
-                    timeline={timeline}
-                    onOpenCourt={handleOpenCourtById}
-                    onExplorePrompt={handleExplorePrompt}
-                    onOpenDNA={() => setIsDNAOpen(true)}
-                    onOpenVaccine={() => setIsVaccineOpen(true)}
-                    anomalies={anomalies}
-                    onOpenAddExpense={() => setIsAddExpenseOpen(true)}
-                    onOpenSimulator={() => setIsSimulatorOpen(true)}
-                  />
-                )}
-                {activeTab === 'transactions' && (
-                  <TransactionsTab
-                    onOpenCourt={handleOpenCourtById}
-                    trustMap={trustMap}
-                    onRefresh={fetchCoreData}
-                    refreshKey={refreshKey}
-                    onOpenAddExpense={() => setIsAddExpenseOpen(true)}
-                  />
-                )}
-                {activeTab === 'anomalies' && (
-                  <AnomaliesTab
-                    anomalies={anomalies}
-                    onOpenCourt={handleOpenCourtById}
-                    onRefresh={fetchCoreData}
-                  />
-                )}
-                {activeTab === 'antibodies' && (
-                  <AntibodiesTab
-                    onOpenVaccine={() => setIsVaccineOpen(true)}
-                    onRefresh={fetchCoreData}
-                  />
-                )}
-                {activeTab === 'budgets' && <BudgetsTab />}
-                {activeTab === 'assistant' && (
-                  <AssistantTab
-                    initialPrompt={assistantPrompt}
-                    onClearInitialPrompt={() => setAssistantPrompt('')}
-                  />
-                )}
-              </>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, y: 14, filter: 'blur(4px)' }}
+                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                  exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
+                  transition={{ duration: 0.25, ease: [0.25, 1, 0.5, 1] }}
+                >
+                  {activeTab === 'overview' && (
+                    <OverviewTab
+                      summary={summary}
+                      timeline={timeline}
+                      onOpenCourt={handleOpenCourtById}
+                      onExplorePrompt={handleExplorePrompt}
+                      onOpenDNA={() => setIsDNAOpen(true)}
+                      onOpenVaccine={() => setIsVaccineOpen(true)}
+                      anomalies={anomalies}
+                      onOpenAddExpense={() => setIsAddExpenseOpen(true)}
+                      onOpenSimulator={() => setIsSimulatorOpen(true)}
+                    />
+                  )}
+                  {activeTab === 'transactions' && (
+                    <TransactionsTab
+                      onOpenCourt={handleOpenCourtById}
+                      trustMap={trustMap}
+                      onRefresh={fetchCoreData}
+                      refreshKey={refreshKey}
+                      onOpenAddExpense={() => setIsAddExpenseOpen(true)}
+                    />
+                  )}
+                  {activeTab === 'anomalies' && (
+                    <AnomaliesTab
+                      anomalies={anomalies}
+                      onOpenCourt={handleOpenCourtById}
+                      onRefresh={fetchCoreData}
+                    />
+                  )}
+                  {activeTab === 'antibodies' && (
+                    <AntibodiesTab
+                      onOpenVaccine={() => setIsVaccineOpen(true)}
+                      onRefresh={fetchCoreData}
+                    />
+                  )}
+                  {activeTab === 'budgets' && <BudgetsTab />}
+                  {activeTab === 'assistant' && (
+                    <AssistantTab
+                      initialPrompt={assistantPrompt}
+                      onClearInitialPrompt={() => setAssistantPrompt('')}
+                    />
+                  )}
+                </motion.div>
+              </AnimatePresence>
             ) : (
               <div className="flex flex-col items-center justify-center py-24 gap-4 text-gray-400">
                 <div className="w-12 h-12 rounded-2xl bg-brand-500 animate-spin flex items-center justify-center text-white font-bold">

@@ -54,3 +54,66 @@ html.dark .card-horizon, .dark .card-horizon {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(163, 174, 208, 0.7);
 }
+
+/* 21st.dev & Magic UI Animations */
+@keyframes border-beam {
+  100% {
+    offset-distance: 100%;
+  }
+}
+
+.animate-border-beam {
+  animation: border-beam var(--duration, 8s) infinite linear;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.08);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 7s ease-in-out infinite;
+}
+
+@keyframes shimmer-move {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes shimmer-sweep {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(150%) skewX(-20deg);
+  }
+}
+
+.shimmer-mask {
+  mask-image: linear-gradient(to right, transparent, black, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black, transparent);
+}
+
+/* Glassmorphic backdrop glow */
+.glass-glow {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.dark .glass-glow {
+  background: rgba(17, 28, 68, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
