@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'DM Sans', 'Poppins', sans-serif;
+  background-color: #F4F7FE;
+  color: #1B254B;
+  transition-property: color, background-color;
+  transition-duration: 200ms;
+  -webkit-font-smoothing: antialiased;
+}
+
+html.dark body, body.dark {
+  background-color: #0B1437;
+  color: #FFFFFF;
+}
+
+/* Horizon UI Standard Card */
+.card-horizon {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  background-color: #ffffff;
+  background-clip: border-box;
+  box-shadow: 14px 17px 40px 4px rgba(112, 144, 176, 0.08);
+  padding: 1.25rem 1.5rem;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid rgba(226, 232, 240, 0.6);
+}
+
+html.dark .card-horizon, .dark .card-horizon {
+  background-color: #111C44;
+  color: #ffffff;
+  box-shadow: none;
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(163, 174, 208, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(163, 174, 208, 0.7);
+}
