@@ -47,7 +47,7 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
 
       const executeSave = async () => {
         await api.createExpense({
-          merchant,
+          merchant: merchant.trim(),
           amount: numAmt,
           category,
           date,
@@ -56,6 +56,9 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
           location,
           notes,
         });
+        setMerchant('');
+        setAmount('');
+        setNotes('');
         onAdded();
         onClose();
       };

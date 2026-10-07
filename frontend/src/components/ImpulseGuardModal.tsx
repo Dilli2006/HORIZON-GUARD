@@ -22,12 +22,12 @@ export const ImpulseGuardModal: React.FC<ImpulseGuardModalProps> = ({
   onProceed,
   onCancelled,
 }) => {
-  const [fastMode, setFastMode] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes default
+  const [fastMode, setFastMode] = useState(true);
+  const [timeLeft, setTimeLeft] = useState(5); // 5s demo speed by default
 
   useEffect(() => {
     if (!isOpen) return;
-    setTimeLeft(fastMode ? 10 : 600);
+    setTimeLeft(fastMode ? 5 : 600);
   }, [isOpen, fastMode]);
 
   useEffect(() => {

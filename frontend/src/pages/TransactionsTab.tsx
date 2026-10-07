@@ -1,14 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Download, Upload, Trash2, Scale, Shield, AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react';
+import { Search, Filter, Download, Upload, Trash2, Scale, Shield, AlertTriangle, CheckCircle, RefreshCw, Plus } from 'lucide-react';
 import { Expense, MerchantTrustItem, api, formatINR } from '../lib/api';
 
 interface TransactionsTabProps {
   onOpenCourt: (anomalyId: number) => void;
   trustMap: Record<string, MerchantTrustItem>;
   onRefresh: () => void;
+  refreshKey?: number;
+  onOpenAddExpense?: () => void;
 }
 
-export const TransactionsTab: React.FC<TransactionsTabProps> = ({ onOpenCourt, trustMap, onRefresh }) => {
+export const TransactionsTab: React.FC<TransactionsTabProps> = ({
+  onOpenCourt,
+  trustMap,
+  onRefresh,
+  refreshKey,
+  onOpenAddExpense,
+}) => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
@@ -25,7 +33,7 @@ export const TransactionsTab: React.FC<TransactionsTabProps> = ({ onOpenCourt, t
 
   useEffect(() => {
     fetchExpenses();
-  }, [search, category]);
+  }, [search, category, refreshKey]);
 
   const handleDelete = async (id: number) => {
     if (!window.confirm('Delete this transaction?')) return;
@@ -73,6 +81,17 @@ export const TransactionsTab: React.FC<TransactionsTabProps> = ({ onOpenCourt, t
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Add Expense Button */}
+          {onOpenAddExpense && (
+            <button
+              onClick={onOpenAddExpense}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold transition shadow-md shadow-brand-500/20"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Record Expense</span>
+            </button>
+          )}
+
           {/* CSV Export */}
           <button
             onClick={handleExport}

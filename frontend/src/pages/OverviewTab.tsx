@@ -13,7 +13,9 @@ import {
   Dna,
   FileCheck,
   Thermometer,
-  Calendar
+  Calendar,
+  Plus,
+  ShieldAlert,
 } from 'lucide-react';
 import { SummaryData, AnomalyDetail, TimelinePoint, formatINR } from '../lib/api';
 import { HorizonWidget } from '../components/HorizonWidget';
@@ -37,6 +39,8 @@ interface OverviewTabProps {
   onOpenDNA: () => void;
   onOpenVaccine: () => void;
   anomalies: AnomalyDetail[];
+  onOpenAddExpense?: () => void;
+  onOpenSimulator?: () => void;
 }
 
 export const OverviewTab: React.FC<OverviewTabProps> = ({
@@ -47,6 +51,8 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
   onOpenDNA,
   onOpenVaccine,
   anomalies,
+  onOpenAddExpense,
+  onOpenSimulator,
 }) => {
   const [promptText, setPromptText] = useState('');
   const [timelineIndex, setTimelineIndex] = useState(timeline.length - 1);
@@ -69,6 +75,36 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
 
   return (
     <div className="space-y-6 pb-12 animate-fadeIn">
+      {/* Top Quick Actions Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:bg-navy-800 border border-slate-200/70 dark:border-white/5 shadow-sm">
+        <div>
+          <h2 className="text-xl font-extrabold text-navy-700 dark:text-white">Financial Immune Operations</h2>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Real-time biometric spend radar & autonomous antibody defense pipeline.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          {onOpenAddExpense && (
+            <button
+              onClick={onOpenAddExpense}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold transition shadow-md shadow-brand-500/25"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Record Expense</span>
+            </button>
+          )}
+          {onOpenSimulator && (
+            <button
+              onClick={onOpenSimulator}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold transition border border-amber-500/20"
+            >
+              <ShieldAlert className="w-4 h-4" />
+              <span>Fraud Simulator</span>
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* 1. Horizon UI 6-Widget Metric Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6 gap-5">
         <HorizonWidget

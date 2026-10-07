@@ -55,12 +55,14 @@ export function App() {
 
   // AI prompt to pre-fill
   const [assistantPrompt, setAssistantPrompt] = useState<string>('');
+  const [refreshKey, setRefreshKey] = useState<number>(0);
 
   const fetchCoreData = () => {
     api.getSummary().then(setSummary).catch(console.error);
     api.getAnomalies().then(setAnomalies).catch(console.error);
     api.getMerchantTrust().then(setTrustMap).catch(console.error);
     api.getTimeline().then(setTimeline).catch(console.error);
+    setRefreshKey((k) => k + 1);
   };
 
   const handleRefresh = () => {
@@ -187,6 +189,8 @@ export function App() {
                     onOpenDNA={() => setIsDNAOpen(true)}
                     onOpenVaccine={() => setIsVaccineOpen(true)}
                     anomalies={anomalies}
+                    onOpenAddExpense={() => setIsAddExpenseOpen(true)}
+                    onOpenSimulator={() => setIsSimulatorOpen(true)}
                   />
                 )}
                 {activeTab === 'transactions' && (
@@ -194,6 +198,8 @@ export function App() {
                     onOpenCourt={handleOpenCourtById}
                     trustMap={trustMap}
                     onRefresh={fetchCoreData}
+                    refreshKey={refreshKey}
+                    onOpenAddExpense={() => setIsAddExpenseOpen(true)}
                   />
                 )}
                 {activeTab === 'anomalies' && (
@@ -263,7 +269,10 @@ export function App() {
       <AddExpenseModal
         isOpen={isAddExpenseOpen}
         onClose={() => setIsAddExpenseOpen(false)}
-        onAdded={fetchCoreData}
+        onAdded={() => {
+          fetchCoreData();
+          setRefreshKey((k) => k + 1);
+        }}
         onTriggerImpulseGuard={(data, executeSave) => {
           setIsAddExpenseOpen(false);
           setGuardData({ ...data, executeSave });
